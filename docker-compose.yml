@@ -1,0 +1,65 @@
+services:
+  food-truck-postgres:
+    build:
+      context: ./src/storage
+      dockerfile: Dockerfile
+    restart: always
+    environment:
+      POSTGRES_DB: food-truck
+      POSTGRES_USER: FoodTruckUser
+      POSTGRES_PASSWORD: FoodTruckPassword
+      PGOPTIONS: --client-min-messages=warning
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - ./src/storage/data:/import-data
+    ports:
+      - "5432:5432"
+    networks:
+      - db
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d food-truck -U FoodTruckUser"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    
+  food-truck-liquibase:
+    container_name: food-truck-liquibase
+    image: liquibase/liquibase
+    command: --url="jdbc:postgresql://food-truck-postgres:5432/food-truck?user=FoodTruckUser&password=FoodTruckPassword" --changeLogFile="changelog.xml" update
+    volumes:
+      - ./src/storage/config/changelog.xml:/liquibase/changelog.xml
+      - ./src/storage/scripts:/liquibase/scripts
+    networks:
+      - db
+    depends_on:
+      food-truck-postgres:
+        condition: service_healthy
+  
+  food-truck-service:
+    build:
+      context: src/services/food-truck
+      dockerfile: Dockerfile
+      target: base
+    volumes:
+      - ./src/services/food-truck/src:/home/node/app/src
+      - ./src/services/food-truck/nodemon.json:/home/node/app/nodemon.json
+    container_name: food-truck-service
+    environment:
+      - DB_URL=food-truck-postgres
+      - DB_PORT=5432
+      - DB_NAME=food-truck
+      - DB_USER=FoodTruckUser
+      - DB_PASSWORD=FoodTruckPassword
+    expose:
+      - '3000'
+    ports:
+      - '3000:3000'
+    command: npm run dev
+    networks:
+      - db
+      
+networks:
+  db: null
+
+volumes:
+  db-data: null  

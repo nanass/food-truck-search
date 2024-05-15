@@ -1,0 +1,37 @@
+{
+  "name": "food-truck",
+  "version": "1.0.0",
+  "description": "This project is the service for food trucks. It defines an API and data access layer for food trucks.",
+  "main": "dist/src/main/server.js",
+  "scripts": {
+    "test": "jest --passWithNoTests --runInBand --no-cache --coverage",
+    "start": "node -r ts-node/register -r tsconfig-paths/register dist/src/main/server.js",
+    "build": "tsc -p .",
+    "dev": "nodemon src/index.ts",
+    "lint": "eslint src/**/*.ts --max-warnings=0"
+  },
+  "author": "Nathan Nass",
+  "license": "ISC",
+  "devDependencies": {
+    "@eslint/js": "^9.2.0",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/jest": "^29.5.12",
+    "@types/pg": "^8.11.6",
+    "@typescript-eslint/eslint-plugin": "^5.31.0",
+    "@typescript-eslint/parser": "^5.31.0",
+    "eslint": "^8.20.0",
+    "jest": "^29.7.0",
+    "nodemon": "^3.1.0",
+    "ts-jest": "^29.1.2",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.1.9"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "kysely": "^0.27.3",
+    "pg": "^8.11.5"
+  }
+}
